@@ -13,13 +13,17 @@
 template <class T> class ArrayList : public List<T>
 {
 private:
-	// TODO
+	T* contents;
+	int capacity;	// How the Array is
+	int count;		// how much of the Array is Used.
+
 
 public:
 	ArrayList()
 	{
-		// TODO
-		throw "TODO";
+		capacity = 10;				// Default
+		contents = new T[capacity];	// Memory for the initial capacity
+		count = 0;
 	}
 
 	virtual int Count() const		// returns the number of items in the list
@@ -36,8 +40,15 @@ public:
 
 	virtual void Append(const T & item)      // add to end of list
 	{
-		// TODO
-		throw "TODO";
+		if (count < capacity) {
+			contents[count] = item;
+			count++;
+		}
+		else {
+			// Extend Capacity
+			// TODO: Double capacity;
+		}
+		
 	}
 
 	virtual T Remove(int index)            // remove item at index
@@ -48,27 +59,31 @@ public:
 
 	virtual const T & Get(int index) const   // return item at index
 	{
-		// TODO
-		throw "TODO";
+		if (index < count) {
+
+		}
+		else {
+			// Outside!
+			throw "Error in GET! Index out of range";
+		}
+		return contents[index];
 	}
 
 
 	class ArrayListIterator : public List<T>::ListIterator
 	{
 	private:
-		// TODO
+		ArrayList<T>* theList;
+		int currentIndex;
 
 	public:
-		ArrayListIterator(ArrayList<T> * theList, int startAt)
+		ArrayListIterator(ArrayList<T> * theList, int startAt) : theList(theList), currentIndex(startAt)
 		{
-			// TODO
-			throw "TODO";
 		}
 
 		virtual bool HasNext() const    // returns true if there is a next item
 		{
-			// TODO
-			throw "TODO";
+			return currentIndex < theList->count;
 		}
 
 		virtual T & Next()              // returns next item and advances iterator toward end
@@ -105,8 +120,10 @@ public:
 
 	virtual List<T>::ListIterator * Begin()  // returns new iterator at beginning of list
 	{
-		// TODO
-		throw "TODO";
+		// Create an Iterator that points to the first point at the
+		ArrayListIterator iter = new ArrayListIterator(this, 0);
+		
+		return iter;
 	}
 
 	virtual List<T>::ListIterator * End()    // returns new iterator past end of list
