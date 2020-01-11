@@ -28,44 +28,59 @@ public:
 
 	virtual int Count() const		// returns the number of items in the list
 	{
-		// TODO
-		throw "TODO";
+		return count;
 	}
 
 	virtual void Insert(const T & item, int index)    // index from 0 to Count
 	{
-		// TODO
-		throw "TODO";
+
+		ValidateIndex(index);
+
+		// Grow if needed, makes a hole
+		Grow();
+		
+
+		for (int i = count; i < index; i--) {
+			contents[i ] = contents[i-1];
+		}
+
+		contents[index] = item;
+		count++;
+		
 	}
+	
 
 	virtual void Append(const T & item)      // add to end of list
 	{
-		if (count < capacity) {
-			contents[count] = item;
-			count++;
-		}
-		else {
-			// Extend Capacity
-			// TODO: Double capacity;
-		}
+		// Grow if needed
+		Grow();
 		
+		// Append
+		contents[count] = item; 
+		count++;
 	}
 
 	virtual T Remove(int index)            // remove item at index
 	{
-		// TODO
-		throw "TODO";
+		ValidateIndex(index);
+
+		// Copied to return
+		T temp = contents[index];
+
+		// Copy over index of item to be removed, shift all
+		for (int i = index; i < count-1; i++) {
+			contents[i] = contents[i + 1];
+		}
+
+		// Adjusting count -1
+		count--;
+		
+		return temp;
 	}
 
 	virtual const T & Get(int index) const   // return item at index
 	{
-		if (index < count) {
-
-		}
-		else {
-			// Outside!
-			throw "Error in GET! Index out of range";
-		}
+		ValidateIndex(index);
 		return contents[index];
 	}
 
@@ -88,7 +103,7 @@ public:
 
 		virtual T & Next()					// returns next item and advances iterator toward end
 		{
-			if (hasNext()) {
+			if (HasNext()) {
 				return theList->contents[currentIndex++];
 			}
 			else {
@@ -104,8 +119,12 @@ public:
 
 		virtual T & Previous()				// returns previous item and advances iterator toward beginning
 		{
-			// TODO
-			throw "TODO";
+			if (HasPrevious()) {
+				return theList->contents[--currentIndex];
+			}
+			else {
+				throw "No Previous Item for Iterator";
+			}
 		}
 
 		virtual void Insert(const T & item)	// inserts item at current position, making room as needed
@@ -124,16 +143,47 @@ public:
 
 	virtual List<T>::ListIterator * Begin()	// returns new iterator at beginning of list
 	{
-		// Create an Iterator that points to the first point at the
-		ArrayListIterator iter = new ArrayListIterator(this, 0);
-		
-		return iter;
+		// Create an Iterator that points to the first index
+		return new ArrayListIterator(this, 0);
 	}
 
-	virtual List<T>::ListIterator * End()	// Returns new iterator past end of list
+	virtual List<T>::ListIterator * End()	// Returns new iterator at end of list
 	{
-		// TODO
-		throw "TODO";
+		// Create an Iterator that points to the last index
+		return new ArrayListIterator(this, count);
 	}
+
+	private:
+
+		virtual void Grow() {
+
+			if (count >= capacity) {
+
+				// New array with 2x capacity
+				T* newContents = new T[2 * capacity];
+
+				// Moving contents to bigger list
+				for (int i = 0; i < capacity; i++) {
+					newContents[i] = contents[i];
+				}
+
+				// deleting what contents is pointing to
+				delete[] contents;
+
+				// Moving pointer of newContents to the memory location of contents.
+				contents = newContents;
+
+				// Increasing new list's capacity
+				capacity *= 2;
+
+			}
+			
+		}
+
+		void ValidateIndex(int index) const {
+			if (index < 0 || index >= count) {
+				throw "Index out of range (ValidateIndex)";
+			}
+		}
 
 };
