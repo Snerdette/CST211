@@ -81,36 +81,40 @@ public:
 		{
 		}
 
-		virtual bool HasNext() const    // returns true if there is a next item
+		virtual bool HasNext() const		// returns true if there is a next item
 		{
 			return currentIndex < theList->count;
 		}
 
-		virtual T & Next()              // returns next item and advances iterator toward end
+		virtual T & Next()					// returns next item and advances iterator toward end
+		{
+			if (hasNext()) {
+				return theList->contents[currentIndex++];
+			}
+			else {
+				throw "No Next Item for Iterator";
+			}	
+
+		}
+
+		virtual bool HasPrevious() const	// returns true if there is a previous item
+		{
+			return currentIndex > 0;
+		}
+
+		virtual T & Previous()				// returns previous item and advances iterator toward beginning
 		{
 			// TODO
 			throw "TODO";
 		}
 
-		virtual bool HasPrevious() const// returns true if there is a previous item
+		virtual void Insert(const T & item)	// inserts item at current position, making room as needed
 		{
 			// TODO
 			throw "TODO";
 		}
 
-		virtual T & Previous()          // returns previous item and advances iterator toward beginning
-		{
-			// TODO
-			throw "TODO";
-		}
-
-		virtual void Insert(const T & item)  // inserts item at current position, making room as needed
-		{
-			// TODO
-			throw "TODO";
-		}
-
-		virtual T Remove()        // removes item at current position, contracting the list
+		virtual T Remove()					// removes item at current position, contracting the list
 		{
 			// TODO
 			throw "TODO";
@@ -118,7 +122,7 @@ public:
 
 	};
 
-	virtual List<T>::ListIterator * Begin()  // returns new iterator at beginning of list
+	virtual List<T>::ListIterator * Begin()	// returns new iterator at beginning of list
 	{
 		// Create an Iterator that points to the first point at the
 		ArrayListIterator iter = new ArrayListIterator(this, 0);
@@ -126,7 +130,7 @@ public:
 		return iter;
 	}
 
-	virtual List<T>::ListIterator * End()    // returns new iterator past end of list
+	virtual List<T>::ListIterator * End()	// Returns new iterator past end of list
 	{
 		// TODO
 		throw "TODO";
