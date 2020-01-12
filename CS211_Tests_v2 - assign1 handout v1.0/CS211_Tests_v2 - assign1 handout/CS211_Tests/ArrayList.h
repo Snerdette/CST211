@@ -39,9 +39,8 @@ public:
 		// Grow if needed, makes a hole
 		Grow();
 		
-
-		for (int i = count; i < index; i--) {
-			contents[i ] = contents[i-1];
+		for(int i = count; i > index; i--) {
+			contents[i] = contents[i-1];
 		}
 
 		contents[index] = item;
