@@ -34,7 +34,7 @@ public:
 	virtual void Insert(const T & item, int index)    // index from 0 to Count
 	{
 
-		ValidateIndex(index);
+		ValidateInsertIndex(index);
 
 		// Grow if needed, makes a hole
 		Grow();
@@ -48,7 +48,6 @@ public:
 		count++;
 		
 	}
-	
 
 	virtual void Append(const T & item)      // add to end of list
 	{
@@ -129,14 +128,14 @@ public:
 
 		virtual void Insert(const T & item)	// inserts item at current position, making room as needed
 		{
-			// TODO
-			throw "TODO";
+			// Reusing the List Insert method
+			return theList->Insert(item, currentIndex);
 		}
 
 		virtual T Remove()					// removes item at current position, contracting the list
 		{
-			// TODO
-			throw "TODO";
+			// Reusing the List Remove method
+			return theList->Remove(currentIndex);
 		}
 
 	};
@@ -180,8 +179,16 @@ public:
 			
 		}
 
+		// Make sure index is within the list or is the last
 		void ValidateIndex(int index) const {
 			if (index < 0 || index >= count) {
+				throw "Index out of range (ValidateIndex)";
+			}
+		}
+
+		// Make sure index is within the list
+		void ValidateInsertIndex(int index) const {
+			if (index < 0 || index > count) {
 				throw "Index out of range (ValidateIndex)";
 			}
 		}
