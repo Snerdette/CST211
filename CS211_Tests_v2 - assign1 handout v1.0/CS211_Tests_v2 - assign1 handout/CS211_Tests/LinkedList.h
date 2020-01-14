@@ -15,34 +15,87 @@ private:
 	class Node
 	{
 	public:
-		// TODO
+		T item;
+		Node* next;
+		Node* prev;
+		Node(const T & item, Node * next, Node * prev) : 
+			item(item), next(next), prev(prev) {}
 	};
 
-	// TODO
+	Node* head;
+	Node* tail;
+	int count;
 
 public:
 	LinkedList()
 	{
-		// TODO
-		throw "TODO";
+		head = nullptr;
+		tail = nullptr;
+		count = 0;
 	}
 
 	virtual int Count() const		// returns the number of items in the list
 	{
-		// TODO
-		throw "TODO";
+		return count;
 	}
 
 	virtual void Insert(const T & item, int index)    // index from 0 to Count
 	{
-		// TODO
-		throw "TODO";
+		ValidateInsertIndex(index);
+
+		Node * newNode = new Node(item, nullptr, nullptr);
+
+		if (index == 0) {
+			newNode->next = head;
+
+			// Inserting at beginning
+			if (head != nullptr) {
+				// List not empty so prev head exsists 
+				head->prev = newNode;
+			}
+			else {
+
+				tail = newNode;
+			}
+			
+			head = newNode;
+		}
+		else if (index == count){
+
+			Append(item);
+		}
+		else {
+			Node* newNode = new Node(item, nullptr, nullptr);
+			Node* insertHere = head;
+			for (int i = 0; i < index; i++) {
+				insertHere = insertHere->next;
+			}
+			Node* prevNode = insertHere->prev;
+			prevNode->next = newNode;
+			newNode->next = insertHere;
+			newNode->prev = prevNode;
+			insertHere->prev = newNode;
+		}
+		
 	}
 
 	virtual void Append(const T & item)      // add to end of list
 	{
-		// TODO
-		throw "TODO";
+		Node* newNode = new Node(item, nullptr, tail);
+
+		if (head == nullptr) {
+			// Empty list
+			head = newNode;
+		}
+		else {
+			// !Empty list
+			tail->next = newNode;			
+		}
+
+		// Move tail and increment count
+		newNode->prev = tail;
+		tail = newNode;
+		count++;
 	}
 
 	virtual T Remove(int index)            // remove item at index
@@ -53,33 +106,41 @@ public:
 
 	virtual const T & Get(int index) const   // return item at index
 	{
-		// TODO
-		throw "TODO";
+		ValidateIndex(index);
+
+		Node* n = head;
+		for (int i = index; i < index; i++) {
+			n = n->next;
+		}
+
+		return n->item;
 	}
 
 
 	class LinkedListIterator : public List<T>::ListIterator
 	{
 	private:
-		// TODO
+		LinkedList * theList;
+		Node * currentNode;
+
 
 	public:
-		LinkedListIterator(LinkedList * theList, Node * startAt)
-		{
-			// TODO
-			throw "TODO";
-		}
+		LinkedListIterator(LinkedList * theList, Node * startAt) : 
+			theList(theList), currentNode(startAt){}
 
 		virtual bool HasNext() const    // returns true if there is a next item
 		{
-			// TODO
-			throw "TODO";
+			return currentNode != nullptr;		
 		}
 
 		virtual T & Next()              // returns next item and advances iterator toward end
 		{
-			// TODO
-			throw "TODO";
+			if (HasNext()) {
+				T& returnThis = currentNode->item;
+				currentNode = currentNode->next;
+				return returnThis;
+			}
+			throw "No next node for iterator!(LinkedListIter)";		
 		}
 
 		virtual bool HasPrevious() const// returns true if there is a previous item
@@ -115,14 +176,27 @@ public:
 
 	virtual List<T>::ListIterator * Begin()  // returns new iterator at beginning of list
 	{
-		// TODO
-		throw "TODO";
+		return new LinkedListIterator(this, head);
 	}
 
 	virtual List<T>::ListIterator * End()    // returns new iterator past end of list
 	{
 		// TODO
 		throw "TODO";
+	}
+
+	// Make sure index is within the list or is the last
+	void ValidateIndex(int index) const {
+		if (index < 0 || index >= count) {
+			throw "Index out of range (ValidateIndex)";
+		}
+	}
+
+	// Make sure index is within the list
+	void ValidateInsertIndex(int index) const {
+		if (index < 0 || index > count) {
+			throw "Index out of range (ValidateIndex)";
+		}
 	}
 };
 
