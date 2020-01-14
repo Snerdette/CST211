@@ -122,8 +122,6 @@ public:
 	private:
 		LinkedList * theList;
 		Node * currentNode;
-
-
 	public:
 		LinkedListIterator(LinkedList * theList, Node * startAt) : 
 			theList(theList), currentNode(startAt){}
