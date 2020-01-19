@@ -45,37 +45,32 @@ public:
 
 		Node * newNode = new Node(item, nullptr, nullptr);
 
-		if (index == 0) {
-			newNode->next = head;
+		
+		Node* insertHere = head;
+		Node* prevOne = nullptr;
+		for (int i = 0; i < index; i++) {
+			prevOne = insertHere;
+			insertHere = insertHere->next;
+		}
 
-			// Inserting at beginning
-			if (head != nullptr) {
-				// List not empty so prev head exsists 
-				head->prev = newNode;
-			}
-			else {
+		newNode->next = insertHere;
+		newNode->prev = prevOne;
 
-				tail = newNode;
-			}
-			
+		if (prevOne == nullptr) {
 			head = newNode;
 		}
-		else if (index == count){
+		else {
+			prevOne->next = newNode;
+		}
 
-			Append(item);
+		if (insertHere == nullptr) {
+			tail = newNode;
 		}
 		else {
-			Node* newNode = new Node(item, nullptr, nullptr);
-			Node* insertHere = head;
-			for (int i = 0; i < index; i++) {
-				insertHere = insertHere->next;
-			}
-			Node* prevNode = insertHere->prev;
-			prevNode->next = newNode;
-			newNode->next = insertHere;
-			newNode->prev = prevNode;
 			insertHere->prev = newNode;
 		}
+
+		count++;
 		
 	}
 
@@ -100,8 +95,12 @@ public:
 
 	virtual T Remove(int index)            // remove item at index
 	{
-		// TODO
-		throw "TODO";
+		Node* nukeThis = head;
+		for (int i = 0; i < index; i++)
+		{
+			nukeThis = nukeThis->next;
+		}
+		return RemoveNode(nukeThis);
 	}
 
 	virtual const T & Get(int index) const   // return item at index
@@ -161,8 +160,13 @@ public:
 
 		virtual T Remove()        // removes item at current position, contracting the list
 		{
-			// TODO
-			throw "TODO";
+			if (currentNode == nullptr) {
+				throw "Cannot remove past end of list";
+			}
+
+			Node* nukeThis = currentNode;
+			currentNode = currentNode->next;
+			return theList->RemoveNode(nukeThis);
 		}
 
 		const T & Get() const
@@ -195,6 +199,35 @@ public:
 		if (index < 0 || index > count) {
 			throw "Index out of range (ValidateIndex)";
 		}
+	}
+
+	T RemoveNode(Node* nukeThis) {
+
+		Node* nextOne = nukeThis->next;
+		Node* prevOne = nukeThis->prev;
+
+		if (prevOne == nullptr)
+		{
+			head = nextOne;
+		}
+		else {
+			prevOne->next = nextOne;
+		}
+
+		if (nextOne == nullptr)
+		{
+			tail = prevOne;
+		}
+		else {
+			nextOne->prev = prevOne;
+		}
+
+		T returnThis = nukeThis->item;
+		delete nukeThis;
+		count--;
+
+		return returnThis;
+
 	}
 };
 
