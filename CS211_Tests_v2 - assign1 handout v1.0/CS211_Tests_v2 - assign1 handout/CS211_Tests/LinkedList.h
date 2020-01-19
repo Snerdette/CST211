@@ -43,34 +43,18 @@ public:
 	{
 		ValidateInsertIndex(index);
 
-		Node * newNode = new Node(item, nullptr, nullptr);
-
-		
+		// Find a pointer to the insertion point and the previous node.
 		Node* insertHere = head;
 		Node* prevOne = nullptr;
+
 		for (int i = 0; i < index; i++) {
 			prevOne = insertHere;
 			insertHere = insertHere->next;
 		}
 
-		newNode->next = insertHere;
-		newNode->prev = prevOne;
+		InsertNode(item, insertHere, prevOne);
 
-		if (prevOne == nullptr) {
-			head = newNode;
-		}
-		else {
-			prevOne->next = newNode;
-		}
-
-		if (insertHere == nullptr) {
-			tail = newNode;
-		}
-		else {
-			insertHere->prev = newNode;
-		}
-
-		count++;
+		
 		
 	}
 
@@ -142,37 +126,49 @@ public:
 
 		virtual bool HasPrevious() const// returns true if there is a previous item
 		{
-			// TODO
-			throw "TODO";
+			// For 2 cases:
+			// if there is a currentNode, then we check if it's prev.
+			// if there is no currentNode, then we're off the end of theList, and we check the tail.
+			return currentNode == nullptr ? theList->tail != nullptr : currentNode->prev != nullptr;
 		}
 
 		virtual T & Previous()          // returns previous item and advances iterator toward beginning
 		{
-			// TODO
-			throw "TODO";
+			if (HasPrevious()) {
+				// Moves the iterator back towards the beginning
+				currentNode = currentNode == nullptr ? currentNode = theList->tail : currentNode->prev;
+
+				// Returns the item at the currentNode.
+				return currentNode->item;
+			}
+			throw "No previous item for the iterator!!";
 		}
 
 		virtual void Insert(const T & item)  // inserts item at current position, making room as needed
 		{
-			// TODO
-			throw "TODO";
+			
 		}
 
 		virtual T Remove()        // removes item at current position, contracting the list
 		{
-			if (currentNode == nullptr) {
+			if (currentNode == nullptr) 
 				throw "Cannot remove past end of list";
-			}
+			
 
 			Node* nukeThis = currentNode;
-			currentNode = currentNode->next;
+			currentNode = currentNode->next;		// Advances the current pointer
 			return theList->RemoveNode(nukeThis);
 		}
 
 		const T & Get() const
 		{
-			// TODO
-			throw "TODO";
+			if (currentNode != nullptr)
+			{
+				return currentNode->item;
+			}
+			else {
+				throw "No current item for iterators (Get)180";
+			}		
 		}
 	};
 
@@ -183,8 +179,7 @@ public:
 
 	virtual List<T>::ListIterator * End()    // returns new iterator past end of list
 	{
-		// TODO
-		throw "TODO";
+		return new LinkedListIterator(this, nullptr);
 	}
 
 	// Make sure index is within the list or is the last
@@ -206,28 +201,58 @@ public:
 		Node* nextOne = nukeThis->next;
 		Node* prevOne = nukeThis->prev;
 
+		// set prevNode->next to nextOne
 		if (prevOne == nullptr)
 		{
-			head = nextOne;
+			head = nextOne;		// deleting first item
 		}
 		else {
 			prevOne->next = nextOne;
 		}
 
+		// set nextOne->prev to prevOne
 		if (nextOne == nullptr)
 		{
-			tail = prevOne;
+			tail = prevOne;		// deleting the last item
 		}
 		else {
 			nextOne->prev = prevOne;
 		}
 
+		// Nuke it!
 		T returnThis = nukeThis->item;
 		delete nukeThis;
 		count--;
 
 		return returnThis;
 
+	}
+
+	void InsertHere(Item & item, Node * insertHere, Node * prevOne) {
+		
+		// Create new node ofr item
+		Node* newNode = new Node(item, nullptr, nullptr);
+
+		// Set newNode's pointers correctly
+		newNode->next = insertHere;
+		newNode->prev = prevOne;
+
+		// prevOne->next = newNode
+		if (prevOne == nullptr) {
+			head = newNode;
+		}
+		else {
+			prevOne->next = newNode;
+		}
+
+		if (insertHere == nullptr) {
+			tail = newNode;
+		}
+		else {
+			insertHere->prev = newNode;
+		}
+
+		count++;
 	}
 };
 
