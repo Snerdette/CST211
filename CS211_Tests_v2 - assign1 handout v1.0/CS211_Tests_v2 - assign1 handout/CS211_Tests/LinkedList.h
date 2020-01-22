@@ -97,7 +97,7 @@ public:
 
 		// Walks forward to find the next item at the index
 		Node* n = head;
-		for (int i = index; i < index; i++) {
+		for (int i = 0; i < index; i++) {
 			n = n->next;
 		}
 
