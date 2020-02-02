@@ -2,8 +2,9 @@
 // Pete Myers, OIT Winter 2020
 // ArrayList implementation of the List data structure
 //
-// Handout Assign1
-//
+// Handout Assignment 1
+// Modified By Kate LaFrance
+// CST 211 Data Structures
 
 #pragma once
 

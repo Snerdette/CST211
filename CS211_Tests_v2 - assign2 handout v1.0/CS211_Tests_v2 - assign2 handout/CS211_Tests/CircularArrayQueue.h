@@ -3,6 +3,7 @@
 // Implementation of the abstract queue interface using a circular array
 //
 // Handout Assign2
+// By Kate LaFrance (Student)
 //
 
 #pragma once
