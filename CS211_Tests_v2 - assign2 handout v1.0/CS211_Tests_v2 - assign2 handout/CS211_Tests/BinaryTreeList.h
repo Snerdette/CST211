@@ -18,10 +18,7 @@ private:
 	class Node
 	{
 	public:
-		Node(const T& item): item(item), left(nullptr), right(nullptr)
-		{
-			
-		}
+		Node(const T& item): item(item), left(nullptr), right(nullptr){	}
 		
 		T item;
 		Node* left;
@@ -56,7 +53,7 @@ public:
 		count++;
 	}
 
-	virtual void Remove(const T & item)  // remove item from list, if it exists
+	virtual void Remove(const T& item)  // remove item from list, if it exists
 	{
 		// TODO
 		throw "TODO";
@@ -66,16 +63,25 @@ private:
 	class BinaryTreeListIterator : public OrderedList<T>::OrderedListIterator
 	{
 	private:
-		// TODO
+		BinaryTreeList* theList;
+		Node* currentNode;
+		ArrayListStack<Node*> path;
 
 	public:
-		BinaryTreeListIterator(BinaryTreeList * list)
+		BinaryTreeListIterator(BinaryTreeList* list): theList(list)
 		{
 			// start at root of tree and then to the smallest node in the tree
-			// TODO
+			currentNode = theList->root; 
+			while (currentNode->left != nullptr) 
+			{
+				path.Push(currentNode);
+				currentNode = currentNode->left;
+			}
+			
 		}
 
-		BinaryTreeListIterator(BinaryTreeList* list, Node* startAt, const ArrayListStack<Node*>& path)
+		BinaryTreeListIterator(BinaryTreeList* list, Node* startAt, const ArrayListStack<Node*>& path) :
+			theList(list), currentNode(startAt), path(path)
 		{
 			// start at specific node, including path to node
 			// TODO
@@ -83,28 +89,63 @@ private:
 
 		virtual bool HasNext() const    // return true if there is a next item
 		{
-			// TODO
-			throw "TODO";
+			return currentNode != nullptr;
 		}
 
 		virtual T & Next()   // return next item and advance iterator toward end
 		{
-			// TODO
-			throw "TODO";
+			if (!HasNext()) {
+				throw "No next item for iterator!!";
+			}
+
+			// Return current Item.
+			T returnThis = currentNode->item;
+
+			// Advance the iterator to the next item
+			if (currentNode->right != nullptr) {
+				// Go down to the right once and all the way to the left.
+				path.Push(currentNode);
+				currentNode = currentNode->right;
+				while (currentNode->left != nullptr) {
+					path.Push(currentNode);
+					currentNode = currentNode->left;
+				}
+			}
+			else {
+
+				// While we have a parent that is smaller, keep moving up to the parent
+				// If we have run out of ancestors and have not found a larger item, then we're done.
+				Node* parent = path.Count() > 0 ? path.Pop() : nullptr;
+				while (parent != nullptr && parent->item < currentNode->item) 
+				{
+					parent = path.Count() > 0 ? path.Pop() : nullptr;
+				}
+				
+				currentNode = parent;
+			}	
+			
+			return returnThis;
 		}
 	};
 
 public:
 	virtual OrderedList<T>::OrderedListIterator * Begin() // return new iterator at beginning of list
 	{
-		// TODO
-		throw "TODO";
+		return new BinaryTreeListIterator(this);
 	}
 
-	virtual OrderedList<T>::OrderedListIterator * Find(const T & target) // return new iterator at target's location in the list, or nullptr if not found
+	virtual OrderedList<T>::OrderedListIterator * Find(const T& target) // return new iterator at target's location in the list, or nullptr if not found
 	{
-		// TODO
-		throw "TODO";
+		// Find target in list and get it's node and path from that to root.
+		ArrayListStack<Node*> path;
+		Node* node = RecursiveFind(root, target, path);
+
+		// Reutn new binaryTreeListIterator, starting at that node
+		if (node != nullptr) {
+			return new BinaryTreeListIterator(this, node, path);
+		}
+
+		return nullptr;
 	}
 
 private:
@@ -133,6 +174,29 @@ private:
 				RecursiveAdd(node->right, item);
 			}
 		}
+	}
+
+	Node* RecursiveFind(Node* node, const T& target, ArrayListStack<Node*>& path ) {
+		
+		// Base cases
+		if (node == nullptr) {
+			return nullptr;
+		}
+		if (node->item == target) {
+			return node;
+		}
+
+		// Recursive case
+		path.Push(node);
+		if (target < node->item) {
+			
+			return RecursiveFind(node->left, target, path);
+		}
+		else {
+			return RecursiveFind(node->right , target, path);
+		}
+
+		
 	}
 };
 
