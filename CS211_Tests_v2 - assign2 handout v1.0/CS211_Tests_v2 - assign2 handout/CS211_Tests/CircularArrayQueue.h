@@ -2,8 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Implementation of the abstract queue interface using a circular array
 //
-// Handout Assign2
-// By Kate LaFrance (Student)
+// Handout Assignment 2
+// By Kate LaFrance
 //
 
 #pragma once

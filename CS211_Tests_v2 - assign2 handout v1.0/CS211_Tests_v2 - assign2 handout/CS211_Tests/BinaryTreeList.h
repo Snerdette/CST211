@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Implementation of a OrderedList data structure using a binary search tree
 //
-// Handout Assign2
+// Handout Assignment 2
+// By Kate LaFrance
 //
 
 #pragma once
@@ -17,32 +18,42 @@ private:
 	class Node
 	{
 	public:
-		Node(const T& item)
+		Node(const T& item): item(item), left(nullptr), right(nullptr)
 		{
-			// TODO
+			
 		}
 		
-		// TODO
+		T item;
+		Node* left;
+		Node* right;
 	};
 
-	// TODO
+	Node* root;
+	int count;
 
 public:
-	BinaryTreeList()
+	BinaryTreeList(): root(nullptr), count(0)
 	{
-		// TODO
+		// Initialize to an empty list
 	}
 
 	virtual int Count() const  // return the number of items in the list
 	{
-		// TODO
-		throw "TODO";
+		return count;
 	}
 
 	virtual void Add(const T & item)  // add new item into proper location in list
 	{
-		// TODO
-		throw "TODO";
+		// For an empty tree, add node in proper place.
+		if (root == nullptr) {
+			root = new Node(item);
+		}
+		else {
+			// Tree already has stuff in it
+			// Call recursive add function containing nullptr checks
+			RecursiveAdd(root, item);
+		}
+		count++;
 	}
 
 	virtual void Remove(const T & item)  // remove item from list, if it exists
@@ -97,6 +108,31 @@ public:
 	}
 
 private:
-	// TODO
+	
+	void RecursiveAdd(Node* node, const T& item) {
+	
+		if (item < node->item) {
+			// Go left
+			if (node->left == nullptr) {
+				// If no left child, add new node to parent's left
+				node->left = new Node(item);
+			}
+			else {
+				// Have a left child, so recurse left
+				RecursiveAdd(node->left, item);
+			}	
+		}
+		else {
+			// Go right
+			if (node->right == nullptr) {
+				// No right child, add new node to parent's right
+				node->right = new Node(item);
+			}
+			else {
+				// Add the new node to it's parent's right
+				RecursiveAdd(node->right, item);
+			}
+		}
+	}
 };
 
