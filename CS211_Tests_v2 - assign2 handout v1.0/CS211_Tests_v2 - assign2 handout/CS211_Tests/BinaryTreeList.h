@@ -55,8 +55,60 @@ public:
 
 	virtual void Remove(const T& item)  // remove item from list, if it exists
 	{
-		// TODO
-		throw "TODO";
+		//target_node = find()
+		ArrayListStack<Node*> path;
+		Node* target_node = RecursiveFind(root, item, path);
+
+		// If empty node
+		if (target_node == nullptr) {
+			throw "Can't remove node we can't find!";
+		}
+
+		// If target_node has no children...
+		if (target_node->left == nullptr && target_node->right == nullptr) 
+		{			
+			// Just nuke the target node
+			ReplaceNode(target_node, nullptr, path);
+		}
+		// else if target_node has 2 children
+		else if (target_node->left != nullptr && target_node->right != nullptr) 
+		{
+			// Find the next_larger node from the target_node
+			// Go down to the right once and all the way to the left
+			// Keeping track of the next_larger node's parent aong the way
+			Node* next_largerParent = target_node;
+			Node* next_larger = target_node->right;
+
+			while (next_larger->left != nullptr) {
+				next_largerParent = next_larger;
+				next_larger = next_larger->left;
+			}
+
+			// If next_larger has a right child
+			if (next_larger->right != nullptr) {
+				// Replace next_larger w/next_larger->right
+				if (next_largerParent->right == next_larger) {
+					next_largerParent->right = next_larger->right;
+				}
+				else {
+					next_largerParent->left = next_larger->right;
+				}			
+			}
+
+			// Replace target_node with next larger
+			ReplaceNode(target_node, next_larger, path);
+		}
+		// else if target_node has 1 child
+		else 
+		{
+			// Get target_node's parent and promote our child
+			Node* child = target_node->left != nullptr ? target_node->left : target_node->right;
+			ReplaceNode(target_node, child, path);
+		}
+
+		// Nuke the target_node!
+		delete target_node;
+		count--;
 	}
 
 private:
@@ -197,6 +249,37 @@ private:
 		}
 
 		
+	}
+
+	void ReplaceNode(Node* replaceThis, Node* withThis, ArrayListStack<Node*>& path) 
+	{
+		// Just nuke the target node
+		if (path.Count() > 0)
+		{
+			// If replaceThis(AKA target_node) has a parent
+			Node* parent = path.Pop();
+			if (parent->left == replaceThis) {
+				parent->left = withThis;
+			}
+			else {
+				parent->right = withThis;
+			}
+		}
+		else {
+			// If target_node is an orphan (is root)
+			root = withThis;
+		}
+
+		// Update withThis's children
+		if (withThis != nullptr) 
+		{
+			if (withThis != replaceThis->left) {
+				withThis->left = replaceThis->left;
+			}
+			if (withThis != replaceThis->right) {
+				withThis->right = replaceThis->right;
+			}
+		}
 	}
 };
 
