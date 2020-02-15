@@ -11,15 +11,14 @@
 #include "OrderedList.h"
 #include "ArrayListStack.h"
 
-
 template <class T> class BinaryTreeList : public OrderedList<T>
 {
 private:
 	class Node
 	{
 	public:
-		Node(const T& item): item(item), left(nullptr), right(nullptr){	}
-		
+		Node(const T& item) : item(item), left(nullptr), right(nullptr) {	}
+
 		T item;
 		Node* left;
 		Node* right;
@@ -29,7 +28,7 @@ private:
 	int count;
 
 public:
-	BinaryTreeList(): root(nullptr), count(0)
+	BinaryTreeList() : root(nullptr), count(0)
 	{
 		// Initialize to an empty list
 	}
@@ -39,7 +38,7 @@ public:
 		return count;
 	}
 
-	virtual void Add(const T & item)  // add new item into proper location in list
+	virtual void Add(const T& item)  // add new item into proper location in list
 	{
 		// For an empty tree, add node in proper place.
 		if (root == nullptr) {
@@ -55,7 +54,6 @@ public:
 
 	virtual void Remove(const T& item)  // remove item from list, if it exists
 	{
-		//target_node = find()
 		ArrayListStack<Node*> path;
 		Node* target_node = RecursiveFind(root, item, path);
 
@@ -65,13 +63,13 @@ public:
 		}
 
 		// If target_node has no children...
-		if (target_node->left == nullptr && target_node->right == nullptr) 
-		{			
+		if (target_node->left == nullptr && target_node->right == nullptr)
+		{
 			// Just nuke the target node
 			ReplaceNode(target_node, nullptr, path);
 		}
 		// else if target_node has 2 children
-		else if (target_node->left != nullptr && target_node->right != nullptr) 
+		else if (target_node->left != nullptr && target_node->right != nullptr)
 		{
 			// Find the next_larger node from the target_node
 			// Go down to the right once and all the way to the left
@@ -92,14 +90,14 @@ public:
 				}
 				else {
 					next_largerParent->left = next_larger->right;
-				}			
+				}
 			}
 
 			// Replace target_node with next larger
 			ReplaceNode(target_node, next_larger, path);
 		}
 		// else if target_node has 1 child
-		else 
+		else
 		{
 			// Get target_node's parent and promote our child
 			Node* child = target_node->left != nullptr ? target_node->left : target_node->right;
@@ -120,16 +118,15 @@ private:
 		ArrayListStack<Node*> path;
 
 	public:
-		BinaryTreeListIterator(BinaryTreeList* list): theList(list)
+		BinaryTreeListIterator(BinaryTreeList* list) : theList(list)
 		{
 			// start at root of tree and then to the smallest node in the tree
-			currentNode = theList->root; 
-			while (currentNode->left != nullptr) 
+			currentNode = theList->root;
+			while (currentNode->left != nullptr)
 			{
 				path.Push(currentNode);
 				currentNode = currentNode->left;
 			}
-			
 		}
 
 		BinaryTreeListIterator(BinaryTreeList* list, Node* startAt, const ArrayListStack<Node*>& path) :
@@ -144,7 +141,7 @@ private:
 			return currentNode != nullptr;
 		}
 
-		virtual T & Next()   // return next item and advance iterator toward end
+		virtual T& Next()   // return next item and advance iterator toward end
 		{
 			if (!HasNext()) {
 				throw "No next item for iterator!!";
@@ -164,29 +161,28 @@ private:
 				}
 			}
 			else {
-
 				// While we have a parent that is smaller, keep moving up to the parent
 				// If we have run out of ancestors and have not found a larger item, then we're done.
 				Node* parent = path.Count() > 0 ? path.Pop() : nullptr;
-				while (parent != nullptr && parent->item < currentNode->item) 
+				while (parent != nullptr && parent->item < currentNode->item)
 				{
 					parent = path.Count() > 0 ? path.Pop() : nullptr;
 				}
-				
+
 				currentNode = parent;
-			}	
-			
+			}
+
 			return returnThis;
 		}
 	};
 
 public:
-	virtual OrderedList<T>::OrderedListIterator * Begin() // return new iterator at beginning of list
+	virtual OrderedList<T>::OrderedListIterator* Begin() // return new iterator at beginning of list
 	{
 		return new BinaryTreeListIterator(this);
 	}
 
-	virtual OrderedList<T>::OrderedListIterator * Find(const T& target) // return new iterator at target's location in the list, or nullptr if not found
+	virtual OrderedList<T>::OrderedListIterator* Find(const T& target) // return new iterator at target's location in the list, or nullptr if not found
 	{
 		// Find target in list and get it's node and path from that to root.
 		ArrayListStack<Node*> path;
@@ -201,9 +197,8 @@ public:
 	}
 
 private:
-	
+
 	void RecursiveAdd(Node* node, const T& item) {
-	
 		if (item < node->item) {
 			// Go left
 			if (node->left == nullptr) {
@@ -213,7 +208,7 @@ private:
 			else {
 				// Have a left child, so recurse left
 				RecursiveAdd(node->left, item);
-			}	
+			}
 		}
 		else {
 			// Go right
@@ -228,8 +223,7 @@ private:
 		}
 	}
 
-	Node* RecursiveFind(Node* node, const T& target, ArrayListStack<Node*>& path ) {
-		
+	Node* RecursiveFind(Node* node, const T& target, ArrayListStack<Node*>& path) {
 		// Base cases
 		if (node == nullptr) {
 			return nullptr;
@@ -241,17 +235,14 @@ private:
 		// Recursive case
 		path.Push(node);
 		if (target < node->item) {
-			
 			return RecursiveFind(node->left, target, path);
 		}
 		else {
-			return RecursiveFind(node->right , target, path);
+			return RecursiveFind(node->right, target, path);
 		}
-
-		
 	}
 
-	void ReplaceNode(Node* replaceThis, Node* withThis, ArrayListStack<Node*>& path) 
+	void ReplaceNode(Node* replaceThis, Node* withThis, ArrayListStack<Node*>& path)
 	{
 		// Just nuke the target node
 		if (path.Count() > 0)
@@ -270,8 +261,11 @@ private:
 			root = withThis;
 		}
 
+		// Update withThis's children, to inherit replaceThis's children
+		// withThis->left
+
 		// Update withThis's children
-		if (withThis != nullptr) 
+		if (withThis != nullptr)
 		{
 			if (withThis != replaceThis->left) {
 				withThis->left = replaceThis->left;
@@ -282,4 +276,3 @@ private:
 		}
 	}
 };
-

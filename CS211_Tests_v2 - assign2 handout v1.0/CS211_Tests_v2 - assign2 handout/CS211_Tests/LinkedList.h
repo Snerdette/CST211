@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Double-Linked List implementation of the List data structure
 //
-// Handout Assign1
+// Handout Assignment 2
+// By Kate LaFrance
 //
 
 #pragma once
