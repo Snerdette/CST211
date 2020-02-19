@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Double-Linked List implementation of the List data structure
 //
-// Handout Assign1
+// Handout Assignment 2
+// By Kate LaFrance
 //
 
 #pragma once
@@ -15,114 +16,250 @@ private:
 	class Node
 	{
 	public:
-		// TODO
+		T item;
+		Node* next;
+		Node* prev;
+		Node(const T& item, Node* next, Node* prev) :
+			item(item), next(next), prev(prev) {
+		}
 	};
 
-	// TODO
+	Node* head;
+	Node* tail;
+	int count;
 
 public:
 	LinkedList()
 	{
-		// TODO
-		throw "TODO";
+		head = nullptr;
+		tail = nullptr;
+		count = 0;
 	}
 
-	virtual int Count() const		// returns the number of items in the list
+	virtual int Count() const		// Returns the number of items in the list
 	{
-		// TODO
-		throw "TODO";
+		return count;
 	}
 
-	virtual void Insert(const T & item, int index)    // index from 0 to Count
+	virtual void Insert(const T& item, int index)    // index from 0 to Count
 	{
-		// TODO
-		throw "TODO";
+		ValidateInsertIndex(index);
+
+		// Find a pointer to the insertion point and the previous node.
+		Node* insertHere = head;
+		Node* prevOne = nullptr;
+
+		for (int i = 0; i < index; i++) {
+			prevOne = insertHere;
+			insertHere = insertHere->next;
+		}
+
+		InsertNode(item, insertHere, prevOne);
+
 	}
 
-	virtual void Append(const T & item)      // add to end of list
+	virtual void Append(const T& item)      // Add to end of list
 	{
-		// TODO
-		throw "TODO";
+		// Create a new node to hold the item
+		Node* newNode = new Node(item, nullptr, tail);
+
+		// Append the new node
+		if (head == nullptr) {
+
+			// Empty list
+			head = newNode;
+		}
+		else {
+			// Not empty list
+			tail->next = newNode;
+		}
+
+		// Move tail and increment count
+		tail = newNode;
+		count++;
 	}
 
-	virtual T Remove(int index)            // remove item at index
+	virtual T Remove(int index)            // Remove item at index
 	{
-		// TODO
-		throw "TODO";
+		ValidateIndex(index);
+
+		// Find a pointer to the new node so it may be removed.
+		Node* nukeThis = head;
+		for (int i = 0; i < index; i++)
+		{
+			nukeThis = nukeThis->next;
+		}
+		return RemoveNode(nukeThis);
 	}
 
-	virtual const T & Get(int index) const   // return item at index
+	virtual const T& Get(int index) const   // Return item at index
 	{
-		// TODO
-		throw "TODO";
+		ValidateIndex(index);
+
+		// Walks forward to find the next item at the index
+		Node* n = head;
+		for (int i = 0; i < index; i++) {
+			n = n->next;
+		}
+
+		return n->item;
 	}
 
 
 	class LinkedListIterator : public List<T>::ListIterator
 	{
 	private:
-		// TODO
-
+		LinkedList* theList;
+		Node* currentNode;
 	public:
-		LinkedListIterator(LinkedList * theList, Node * startAt)
+		LinkedListIterator(LinkedList* theList, Node* startAt) :
+			theList(theList), currentNode(startAt) {}
+
+		virtual bool HasNext() const    // Returns true if there is a next item
 		{
-			// TODO
-			throw "TODO";
+			return currentNode != nullptr;
 		}
 
-		virtual bool HasNext() const    // returns true if there is a next item
+		virtual T& Next()              // Returns next item and advances iterator toward end
 		{
-			// TODO
-			throw "TODO";
+			if (HasNext()) {
+				T& returnThis = currentNode->item;
+				currentNode = currentNode->next;
+				return returnThis;
+			}
+			throw "No next node for iterator!(LinkedListIter)";
 		}
 
-		virtual T & Next()              // returns next item and advances iterator toward end
+		virtual bool HasPrevious() const		// Returns true if there is a previous item
 		{
-			// TODO
-			throw "TODO";
+			// Two cases:
+				// If there is a currentNode, then we check if it's prev.
+				// If there is no currentNode, then we're off the end of theList, and we check the tail.
+			return currentNode == nullptr ? theList->tail != nullptr : currentNode->prev != nullptr;
 		}
 
-		virtual bool HasPrevious() const// returns true if there is a previous item
+		virtual T& Previous()          // Returns previous item and advances iterator toward beginning
 		{
-			// TODO
-			throw "TODO";
+			if (HasPrevious()) {
+				// Move the iterator back towards the beginning
+				currentNode = currentNode == nullptr ? currentNode = theList->tail : currentNode->prev;
+
+				// Returns the item at the currentNode.
+				return currentNode->item;
+			}
+			throw "No previous item for the iterator! (LLI-Previous())";
 		}
 
-		virtual T & Previous()          // returns previous item and advances iterator toward beginning
+		virtual void Insert(const T& item)  // Inserts item at current position, making room as needed
 		{
-			// TODO
-			throw "TODO";
+			// Insert the item in a new node at the currentNode location
+			theList->InsertNode(item, currentNode, currentNode == nullptr ? theList->tail : currentNode->prev);
+
+			// Update currentNode to point to the newly created node.
+			currentNode = currentNode == nullptr ? theList->tail : currentNode->prev;
 		}
 
-		virtual void Insert(const T & item)  // inserts item at current position, making room as needed
+		virtual T Remove()        // Removes item at current position, contracting the list
 		{
-			// TODO
-			throw "TODO";
+			if (currentNode == nullptr)
+				throw "Cannot remove past end of list";
+
+
+			Node* nukeThis = currentNode;
+			currentNode = currentNode->next;		// Advances the current pointer
+			return theList->RemoveNode(nukeThis);
 		}
 
-		virtual T Remove()        // removes item at current position, contracting the list
+		const T& Get() const		// Returns the current node if it's not empty
 		{
-			// TODO
-			throw "TODO";
-		}
-
-		const T & Get() const
-		{
-			// TODO
-			throw "TODO";
+			if (currentNode != nullptr)
+			{
+				return currentNode->item;
+			}
+			else {
+				throw "No current item for iterators (Get)180";
+			}
 		}
 	};
 
-	virtual List<T>::ListIterator * Begin()  // returns new iterator at beginning of list
+	virtual List<T>::ListIterator* Begin()  // Returns new iterator at beginning of list
 	{
-		// TODO
-		throw "TODO";
+		return new LinkedListIterator(this, head);
 	}
 
-	virtual List<T>::ListIterator * End()    // returns new iterator past end of list
+	virtual List<T>::ListIterator* End()    // Returns new iterator past end of list
 	{
-		// TODO
-		throw "TODO";
+		return new LinkedListIterator(this, nullptr);
+	}
+
+	// Make sure index is within the list or is the last
+	void ValidateIndex(int index) const {
+		if (index < 0 || index >= count) {
+			throw "Index out of range (ValidateIndex)";
+		}
+	}
+
+	// Make sure index is within the list
+	void ValidateInsertIndex(int index) const {
+		if (index < 0 || index > count) {
+			throw "Index out of range (ValidateIndex)";
+		}
+	}
+
+	T RemoveNode(Node* nukeThis) {
+
+		Node* nextOne = nukeThis->next;
+		Node* prevOne = nukeThis->prev;
+
+		// set prevNode->next to nextOne
+		if (prevOne == nullptr)
+		{
+			head = nextOne;		// deleting first item
+		}
+		else {
+			prevOne->next = nextOne;
+		}
+
+		// set nextOne->prev to prevOne
+		if (nextOne == nullptr)
+		{
+			tail = prevOne;		// deleting the last item
+		}
+		else {
+			nextOne->prev = prevOne;
+		}
+
+		// Nuke it!
+		T returnThis = nukeThis->item;
+		delete nukeThis;
+		count--;
+
+		return returnThis;
+
+	}
+
+	void InsertNode(const T& item, Node* insertHere, Node* prevOne) {
+
+		// Create new node for the item
+		Node* newNode = new Node(item, insertHere, prevOne);
+
+
+		// prevOne->next = newNode
+		if (prevOne == nullptr) {
+			head = newNode;
+		}
+		else {
+			prevOne->next = newNode;
+		}
+
+		if (insertHere == nullptr) {
+			tail = newNode;
+		}
+		else {
+			insertHere->prev = newNode;
+		}
+
+		count++;
 	}
 };
 
