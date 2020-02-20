@@ -22,9 +22,45 @@ private:
 public:
 	ArrayList()
 	{
-		capacity = 10;				// Default
-		contents = new T[capacity];	// Memory for the initial capacity
-		count = 0;
+		capacity = 10;							// Default
+		contents = new T[capacity];				// Memory for the initial capacity
+		count = 0;								// Empty list to start
+	}
+
+	
+	ArrayList(const ArrayList<T>& copyFrom) {
+
+		// Copy the values from copyFrom to this new list
+		capacity = copyFrom.capacity;
+		contents = new T[capacity];
+		count = copyFrom.count;
+
+		// Deep copy the contents
+		for (int i = 0; i < count; i++) {
+			contents[i] = copyFrom.contents[i];
+		}
+	}
+
+
+	void operator=(const ArrayList<T>& copyFrom) {
+
+		// Nuke current contents if necessary
+		if (capacity != copyFrom.capacity) {
+			
+			if (contents != nullptr) {
+				delete[] contents;
+			}
+
+			capacity = copyFrom.capacity;
+			contents = new T[capacity];
+		}
+		
+		count = copyFrom.count;
+		
+		// Deep copy the contents from copyFrom to this new list
+		for (int i = 0; i < count; i++) {
+			contents[i] = copyFrom.contents[i];
+		}
 	}
 
 	virtual int Count() const		// returns the number of items in the list
@@ -81,6 +117,11 @@ public:
 	{
 		ValidateIndex(index);
 		return contents[index];
+	}
+
+	void Set(int index, const T value) {
+		ValidateIndex(index);
+		contents[index] = value;
 	}
 
 
