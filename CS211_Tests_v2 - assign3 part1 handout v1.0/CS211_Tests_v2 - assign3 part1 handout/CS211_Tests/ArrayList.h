@@ -26,7 +26,6 @@ public:
 		contents = new T[capacity];				// Memory for the initial capacity
 		count = 0;								// Empty list to start
 	}
-
 	
 	ArrayList(const ArrayList<T>& copyFrom) {
 
@@ -40,7 +39,6 @@ public:
 			contents[i] = copyFrom.contents[i];
 		}
 	}
-
 
 	void operator=(const ArrayList<T>& copyFrom) {
 
