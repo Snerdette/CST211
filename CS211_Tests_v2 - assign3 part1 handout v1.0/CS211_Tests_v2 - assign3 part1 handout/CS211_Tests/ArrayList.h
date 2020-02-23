@@ -2,7 +2,7 @@
 // Pete Myers, OIT Winter 2020
 // ArrayList implementation of the List data structure
 //
-// Handout Assignment 2
+// Handout Assignment 2 & 3
 // By Kate LaFrance
 //
 
