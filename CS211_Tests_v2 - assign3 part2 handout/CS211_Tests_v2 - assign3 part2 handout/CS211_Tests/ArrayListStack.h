@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Implementation of Stack data structure using an ArrayList
 //
-// Handout Assign2
+// Handout Assignment 2
+// By Kate LaFrance
 //
 
 #pragma once
@@ -13,36 +14,33 @@
 template <class T> class ArrayListStack : public Stack<T>
 {
 private:
-	// TODO
+	ArrayList<T> contents;
 
 public:
 	ArrayListStack()
 	{
-		// TODO
-	}
-	
-	virtual int Count() const		// returns the number of items in the stack
-	{
-		// TODO
-		throw "TODO";
+		// Nothing needed here...so far...
 	}
 
-	virtual void Push(const T & item)    // push item onto the stack
+	virtual int Count() const		// returns the number of items in the stack
 	{
-		// TODO
-		throw "TODO";
+		return contents.Count();
+	}
+
+	virtual void Push(const T& item)    // push item onto the stack
+	{
+		contents.Append(item);
 	}
 
 	virtual T Pop()            // pop top item from the stack
 	{
-		// TODO
-		throw "TODO";
+		// "POP"s the olast item from the ArrayList
+		return contents.Remove(contents.Count() - 1);
 	}
 
-	virtual const T & Peek() const   // return item at top of stack, leave it there
+	virtual const T& Peek() const   // return item at top of stack, leave it there
 	{
-		// TODO
-		throw "TODO";
+		return contents.Get(contents.Count() - 1);
 	}
 };
 
