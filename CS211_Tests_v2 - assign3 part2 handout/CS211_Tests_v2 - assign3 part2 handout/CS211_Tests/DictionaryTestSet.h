@@ -19,7 +19,8 @@ public:
 	virtual int Hash(const std::string& key) const
 	{
 		std::size_t hc = std::hash<std::string>()(key);
-		return (int)hc;
+		// the mask (0xzfffffff) is removing the bits making the keys negative.
+		return (int)(hc & 0x7fffffff);
 	}
 };
 

@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Hash table implementation of the Dictionary data structure
 //
-// Handout Assign3 part 2
+// By Kate LaFrance
+// Handout Assignment 3 part 2
 //
 
 #pragma once
@@ -17,96 +18,157 @@ private:
 
 	class HashTable
 	{
+	private: 
+		Hasher<K>* hasher;
+		int count;
+		int capacity;
+		Pair<K, V>** contents;		// an array of pointers to Pair<K, V>
 	public:
-		HashTable(int capacity) {};
-		void Add(const K& key, const V& value) {};
-		bool Contains(const K& key) const { return false; };
-		Pair<K, V>* operator[](int i) { return nullptr; };
+
+		HashTable(Hasher<K>* hasher, int capacity): hasher(hasher), capacity(capacity), count(0)
+		{
+			// Array of pair pointers initialized to nullptr
+			contents = new Pair<K, V> * [capacity] { nullptr };
+		};
+
+		int Capacity() { return capacity; }
+		int Count() { return count; }
+
+
+		void Add(const K& key, const V& value) 
+		{
+			// Check for capacity
+			if (count == capacity) {
+				throw "No more room in the hash table!!";
+			}
+
+			// Check for duplicate key.
+			int hc = hasher->Hash(key) % capacity;
+
+			// Find empty space in hash table
+			if (contents[hc] != nullptr) 
+			{
+				// Linerar probe to find an available cell.
+
+				while (contents[hc] != nullptr) {
+					hc = (hc + 1) % capacity;		// Loop around if reach the end.
+				}
+			}
+
+			// Store the key/value at the hc index.
+			contents[hc] = new Pair<K, V>{ key, value };
+
+			// increment count
+			count++;
+		};
+
+		//bool Contains(const K& key) const 
+		//{ 
+		//	// Get hash code for key.
+		//	int hc = hasher->Hash(key) % capacity;
+
+		//	// Store in temp for do whiles' termination value.
+		//	int tryHc = hc;
+		//	
+		//	 do {
+		//		
+		//		 // Check if there's nothing there
+		//		 if (contents[tryHc] == nullptr)
+		//			 return nullptr;
+
+		//		 // check if key is actually found
+		//		if (contents[tryHc]->key == key) 
+		//			return true;
+		//		
+
+		//		// Probe forward!
+		//		tryHc = (tryHc + 1) % capacity;
+		//		
+		//	 } while (tryHc != hc);
+
+		//	 // looped through all and key not found!
+		//	return false;
+
+		//};
+
+		Pair<K, V>* Get(const K& key) const
+		{
+			// Get hash code for key.
+			int hc = hasher->Hash(key) % capacity;
+
+			// Store in temp for do whiles' termination value.
+			int tryHc = hc;
+
+			do {
+
+				// Check if there's nothing there
+				if (contents[tryHc] == nullptr)
+					return nullptr;
+
+				// check if key is actually found
+				if (contents[tryHc]->key == key)
+					return contents[tryHc];
+
+
+				// Probe forward!
+				tryHc = (tryHc + 1) % capacity;
+
+			} while (tryHc != hc);
+
+			// looped through all and key not found!
+			return nullptr;
+		}
+
+		Pair<K, V>* GetPairAt(int i) 
+		{ 
+			return contents[i]; 
+		};
 	};
 
 	Hasher<K> * hasher;
-	int count;
-	int capacity;
 	//Pair<K, V>** theHashTable;		// An array of pointers to Pair<K,V>
 	HashTable* theHashTable;
+	int count;
+	int capacity;
 
 public:
 	HashDictionary(Hasher<K>* hasher) : hasher(hasher)
 	{
-		count = 0;
-		capacity = 10;
 		//theHashTable = new Pair<K, V> * [capacity] {nullptr};	// Initializes the hashtable to be empty		
-		theHashTable = new HashTable(capacity);
+		theHashTable = new HashTable(hasher, 10);
 	}
+
 
 	virtual int Count() const
 	{
 		// return the number of items in the dictionary
-		return count;
+		return theHashTable->Count();
 	}
 
 	virtual void Add(const K& key, const V& value)
 	{
 
 		// 1. Check for duplicate keys, stop if already present
-		if (!theHashTable->Contains(key)) {
+		if (!theHashTable->Get(key)) {
 			
 			// 2. Grow if necessary
-			if (count == capacity) {
+			if (theHashTable->Count() == theHashTable->Capacity()) {
 				// Grow the table
-				HashTable* newHashTable = new HashTable(capacity * 2);
-				for (int i = 0; i < capacity; i++)
+				HashTable* newHashTable = new HashTable(hasher, theHashTable->Capacity() * 2);
+				for (int i = 0; i < theHashTable->Capacity(); i++)
 				{
-					if ((*theHashTable)[i] != nullptr) {
-						newHashTable->Add((*theHashTable)[i]->key, (*theHashTable)[i]->value);
-					}
-					delete theHashTable;
-					theHashTable = newHashTable;
-					capacity *= 2;
+					newHashTable->Add(theHashTable->GetPairAt(i)->key, theHashTable->GetPairAt(i)->value);
 				}
+
+				// out with old, in with new
+				delete theHashTable;
+				theHashTable = newHashTable;
 
 			}
 
 			// 3. Add the new key/value pair
 			theHashTable->Add(key, value);
-			count++;
-		}
-		// add key/value pair to the dictionary, no action if already there
-
-		// Check for duplicate key.
-		//int hc = hasher->Hash(key) % capacity;
-		//if (theHashTable[hc] == nullptr || theHashTable[hc]->key != key) {
-
-		//	// Know when to grow!
-		//	if (count == capacity) {
-
-		//		// Save the old for a moment
-		//		int oldCount = count;
-		//		int oldCapacity = capacity;
-		//		Pair<K, V>** oldHashTable = theHashTable;
-
-		//		// Grow the hash table
-		//		count = 0;
-		//		capacity *= 2;
-		//		theHashTable = new Pair<K, V> * [capacity] { nullptr };
-
-		//		for (int i = 0; i < length; i++)
-		//			Add(oldHashTable[i].key, oldHashTable[i].value);
-
-		//		// Delete oldHashTable
-		//		delete[] oldHashTable;
-		//	}
-		//}
-
-		//
-
-		//
-
-		//// Store key/value at hc index.
-		//theHashTable[hc] = new Pair<K, V>{ key, value };
-
-		//// Increment the count
-		//count++;
+		}	
 	}
 
 	virtual void Remove(const K& key)
@@ -118,13 +180,21 @@ public:
 	virtual bool Contains(const K& key) const
 	{
 		// return true if key is in the dictionary
-		throw "TODO: HashDictionary::Contains()";
+		//throw "TODO: HashDictionary::Contains()";
+		return theHashTable->Get(key) != nullptr;
 	}
 
 	virtual V& Get(const K& key) const
 	{
+		Pair<K, V>* pair = theHashTable->Get(key);
+
+		if(pair == nullptr)
+			throw "Get(key) not found";
+
 		// return the value for key
-		throw "TODO: HashDictionary::Get()";
+		return pair->value;
+		
+		
 	}
 
 	virtual DictionaryIterator<K, V>* Iterate()

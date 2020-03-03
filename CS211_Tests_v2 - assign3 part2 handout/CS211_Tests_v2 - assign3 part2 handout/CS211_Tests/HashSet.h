@@ -2,7 +2,8 @@
 // Pete Myers, OIT Winter 2020
 // Hash table implementation of the Set data structure
 //
-// Handout Assign3 part 2
+// By Kate LaFrance
+// Handout Assignment 3 part 2
 //
 
 #pragma once
