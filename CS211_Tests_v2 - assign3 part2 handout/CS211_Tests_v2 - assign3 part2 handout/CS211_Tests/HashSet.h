@@ -17,41 +17,41 @@
 template <class T> class HashSet : public Set<T>
 {
 private:
-
+	HashDictionary<T, bool> dictionary;
 public:
-	HashSet(Hasher<T>* hasher)
+	HashSet(Hasher<T>* hasher): dictionary(hasher)
 	{
-		throw "TODO: HashSet::ctor()";
 	}
 
 	virtual int Count() const
 	{
-		// return the number of items in the set
-		throw "TODO: HashSet::Count()";
+		// Call HashDictionary class's Count() and return the number of items in the set
+		return dictionary.Count();
 	}
 
 	virtual void Add(const T& item)
 	{
-		// add item to the set, no action if already there
-		throw "TODO: HashSet::Add()";
+		// Call HashDictionary class's Add() and add the item to the set
+		// No action if already there
+		dictionary.Add(item, true);
 	}
 
 	virtual void Remove(const T& item)
 	{
-		// remove item from the set
-		throw "TODO: HashSet::Remove()";
+		// Call HashDictionary class's Remove() to remove the item from the set
+		dictionary.Remove(item);
 	}
 
 	virtual bool Contains(const T& item) const
 	{
-		// return true if item is in the set
-		throw "TODO: HashSet::Contains()";
+		// Call HashDictionary class's Contains() and return true if item is in the set
+		return dictionary.Contains(item);
 	}
 
 	virtual SetIterator<T>* Iterate()
 	{
-		// returns new iterator for the set
-		throw "TODO: HashSet::Iterate()";
+		// Returns a new iterator for the set
+		return new HashSetIterator(this);
 	}
 
 private:
@@ -64,19 +64,19 @@ private:
 	public:
 		HashSetIterator(HashSet<T>* theSet) : theSet(theSet)
 		{
-			throw "TODO: HashSetIterator::ctor()";
+			iter = theSet->dictionary.Iterate();
 		}
 
 		virtual bool HasNext() const
 		{
-			// returns true if there is a next item
-			throw "TODO: HashSetIterator::HasNext()";
+			// Calls the DictionaryIterator HasNext() and returns true if there is a next item
+			return iter->HasNext();
 		}
 
 		virtual T Next()
 		{
-			// returns next item and advances iterator toward end
-			throw "TODO: HashSetIterator::Next()";
+			// Calls DictionaryIterator's Next(), returns the next item, and advances iterator toward end
+			return iter->Next().key;
 		}
 	};
 };

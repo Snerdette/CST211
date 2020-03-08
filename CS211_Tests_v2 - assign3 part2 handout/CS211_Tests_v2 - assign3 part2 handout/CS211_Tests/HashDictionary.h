@@ -62,34 +62,41 @@ private:
 			count++;
 		};
 
-		//bool Contains(const K& key) const 
-		//{ 
-		//	// Get hash code for key.
-		//	int hc = hasher->Hash(key) % capacity;
+		void Remove(const K& key)
+		{
+			// Get hash code for key.
+			int hc = hasher->Hash(key) % capacity;
 
-		//	// Store in temp for do whiles' termination value.
-		//	int tryHc = hc;
-		//	
-		//	 do {
-		//		
-		//		 // Check if there's nothing there
-		//		 if (contents[tryHc] == nullptr)
-		//			 return nullptr;
+			// Store in temp for do whiles' termination value.
+			int tryHc = hc;
 
-		//		 // check if key is actually found
-		//		if (contents[tryHc]->key == key) 
-		//			return true;
-		//		
+			do {
 
-		//		// Probe forward!
-		//		tryHc = (tryHc + 1) % capacity;
-		//		
-		//	 } while (tryHc != hc);
+				// Check if there's nothing there
+				if (contents[tryHc] == nullptr)
+					throw "This key does not exsist!";
 
-		//	 // looped through all and key not found!
-		//	return false;
+				// check if key is actually found
+				if (contents[tryHc]->key == key) {
+					
+					// Nuke value
+					contents[tryHc] = nullptr;
 
-		//};
+					// Decrement the count
+					count--;
+
+					// End the search
+					return;
+				}
+
+				// Probe forward!
+				tryHc = (tryHc + 1) % capacity;
+
+			} while (tryHc != hc);
+
+			// If not found at all
+			throw "Key does not exsist!";
+		}
 
 		Pair<K, V>* Get(const K& key) const
 		{
@@ -173,14 +180,13 @@ public:
 
 	virtual void Remove(const K& key)
 	{
-		// remove key from the dictionary, along with its value
-		throw "TODO: HashDictionary::Remove()";
+		// Call hashtable class's remove function
+		theHashTable->Remove(key);
 	}
 
 	virtual bool Contains(const K& key) const
 	{
 		// return true if key is in the dictionary
-		//throw "TODO: HashDictionary::Contains()";
 		return theHashTable->Get(key) != nullptr;
 	}
 
@@ -200,23 +206,62 @@ public:
 	virtual DictionaryIterator<K, V>* Iterate()
 	{
 		// returns new iterator for the dictionary
-		throw "TODO: HashDictionary::Iterate()";
+		return new HashDictionaryIterator(this);
 	}
 
 private:
 	class HashDictionaryIterator : public DictionaryIterator<K, V>
 	{
+
+	private:
+		HashDictionary* theDictionary;
+		int currentIndex;
 	public:
+
+		HashDictionaryIterator(HashDictionary * theDictionary): theDictionary(theDictionary)
+		{
+			// Start at "first" pair in hash table
+			currentIndex = 0;
+
+			// Find the first non-empty cell in the hash table
+			while (currentIndex < theDictionary->theHashTable->Capacity() &&
+				theDictionary->theHashTable->GetPairAt(currentIndex) == nullptr)
+			{
+				currentIndex++;
+			}
+		}
+
 		virtual bool HasNext() const
 		{
 			// returns true if there is a next item
-			throw "TODO: HashDictionaryIterator::HasNext()";
+			// Returns true is the index is within the capacity
+			// and there is a pair at the current location
+			return (currentIndex < theDictionary->theHashTable->Capacity() &&
+				theDictionary->theHashTable->GetPairAt(currentIndex) != nullptr);
+			
 		}
 
 		virtual Pair<K, V> Next()
 		{
-			// returns next item and advances iterator toward end
-			throw "TODO: HashDictionaryIterator::Next()";
+			// Get the pair at the current index
+			Pair<K, V>* pair = theDictionary->theHashTable->GetPairAt(currentIndex);
+
+			// Check if nullptr, if so throw exception
+			if (pair == nullptr)
+				throw "No next pair for dictionary!";
+
+			// Increment index to the "next" index
+			currentIndex++;
+
+			// Advance iterator to the next non-empty cell in the hash table
+			while (currentIndex < theDictionary->theHashTable->Capacity() &&
+				theDictionary->theHashTable->GetPairAt(currentIndex) == nullptr)
+			{
+				currentIndex++;
+			}
+
+			// Return the pair
+			return *pair;
 		}
 	};
 
